@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
+import { PaginationQueryDto } from '../../common/pagination/dtos/pagination_query.dto.js';
+import { PaginatedResponse } from '../../common/pagination/interfaces/paginated-response.interface.js';
+import { buildPaginationMeta } from '../../common/pagination/helpers/pagination.helper.js';
 
 @Injectable()
 export class ProductsService {
@@ -17,8 +20,20 @@ export class ProductsService {
     return await this.productsRepository.save(product);
   }
 
-  async findAll(): Promise<Product[]> {
-    return await this.productsRepository.find();
+  async findAll(query: PaginationQueryDto): Promise<PaginatedResponse<Product>> {
+    const limit = query.limit ?? 10;
+    const page = query.page ?? 1;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.productsRepository.findAndCount({
+      skip,
+      take: limit,
+    });
+
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit, '/products'),
+    };
   }
 
   async findOne(id: number): Promise<Product> {

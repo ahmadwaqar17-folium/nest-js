@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { ProductsService } from './providers/products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PaginationQueryDto } from '../common/pagination/dtos/pagination_query.dto.js';
 
 @Controller('products')
 export class ProductsController {
@@ -20,13 +21,14 @@ export class ProductsController {
   }
 
   @Get()
-  async findAll() {
-    const data = await this.productsService.findAll();
+  async findAll(@Query() query: PaginationQueryDto) {
+    const result = await this.productsService.findAll(query);
     return {
       code: 200,
       status: 'success',
       message: 'Products retrieved successfully',
-      data,
+      data: result.data,
+      meta: result.meta,
     };
   }
 
