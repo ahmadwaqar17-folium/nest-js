@@ -8,19 +8,25 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  Inject,
 } from '@nestjs/common';
 import { UsersService } from './providers/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto } from '../common/pagination/dtos/pagination_query.dto.js';
+import { CreateUserProvider } from './providers/create-user/create-user.abstract';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(
+    private readonly usersService: UsersService,
+    @Inject(CreateUserProvider)
+    private readonly createUserProvider: CreateUserProvider,
+  ) { }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return this.createUserProvider.createUser(createUserDto);
   }
 
   @Get()

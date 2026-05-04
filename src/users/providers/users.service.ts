@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException, RequestTimeoutException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, RequestTimeoutException, BadRequestException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -8,33 +8,18 @@ import { DataSource } from 'typeorm';
 import { PaginationQueryDto } from '../../common/pagination/dtos/pagination_query.dto.js';
 import { PaginatedResponse } from '../../common/pagination/interfaces/paginated-response.interface.js';
 import { buildPaginationMeta } from '../../common/pagination/helpers/pagination.helper.js';
+import { CreateUserProvider } from './create-user/create-user.abstract';
+
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private readonly dataSource: DataSource
+    private readonly dataSource: DataSource,
+    @Inject(CreateUserProvider)
+    private readonly createUserProvider: CreateUserProvider,
   ) { }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    let existingUser: User | null = null;
-
-    try {
-      existingUser = await this.usersRepository.findOne({
-        where: { email: createUserDto.email },
-      });
-    } catch (error) {
-      throw new RequestTimeoutException('Failed to check existing user');
-    }
-
-    if (existingUser) {
-      throw new BadRequestException('User already exists with this email');
-    }
-
-    const newUser = this.usersRepository.create(createUserDto);
-
-    return await this.usersRepository.save(newUser);
-  }
   async findAll(query: PaginationQueryDto): Promise<PaginatedResponse<User>> {
     const limit = query.limit ?? 10;
     const page = query.page ?? 1;
@@ -57,6 +42,12 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     return user;
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.usersRepository.findOne({
+      where: { email },
+    });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
