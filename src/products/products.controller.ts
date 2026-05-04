@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpCode, HttpStatus, Query, UseGuards } from '@nestjs/common';
 import { ProductsService } from './providers/products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationQueryDto } from '../common/pagination/dtos/pagination_query.dto.js';
+import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 
 @Controller('products')
 export class ProductsController {
@@ -21,6 +22,7 @@ export class ProductsController {
   }
 
   @Get()
+  @UseGuards(AccessTokenGuard)
   async findAll(@Query() query: PaginationQueryDto) {
     const result = await this.productsService.findAll(query);
     return {

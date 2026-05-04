@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from './config/jwt.config';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AccessTokenGuard } from './guards/access-token.guard';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useClass: Bcrypt,
     },
     AuthService,
+    AccessTokenGuard,
   ],
-  exports: [Hashing, AuthService],
+  exports: [Hashing, AuthService, AccessTokenGuard, JwtModule],
 })
 export class AuthModule {}
