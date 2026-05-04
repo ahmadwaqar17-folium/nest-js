@@ -9,7 +9,9 @@ import {
   ParseIntPipe,
   Query,
   Inject,
+  UseInterceptors,
 } from '@nestjs/common';
+import { ClassSerializerInterceptor } from '@nestjs/common';
 import { UsersService } from './providers/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,12 +20,13 @@ import { CreateUserProvider } from './providers/create-user/create-user.abstract
 import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('users')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     @Inject(CreateUserProvider)
     private readonly createUserProvider: CreateUserProvider,
-  ) { }
+  ) {}
 
   @Public()
   @Post()

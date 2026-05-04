@@ -45,6 +45,7 @@ export class AuthService {
       {
         sub: user.id,
         email: user.email,
+        role: user.role,
       },
       {
         audience: jwtConfiguration.audience,
@@ -88,6 +89,7 @@ export class AuthService {
         {
           sub: user.id,
           email: user.email,
+          role: user.role,
         },
         {
           audience: jwtConfiguration.audience,

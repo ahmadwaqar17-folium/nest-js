@@ -4,10 +4,15 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationQueryDto } from '../common/pagination/dtos/pagination_query.dto.js';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Public } from '../auth/decorators/public.decorator';
+import { UserRole } from '../users/enums/user-role.enum';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('products')
+@UseGuards(AccessTokenGuard)
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -22,7 +27,8 @@ export class ProductsController {
   }
 
   @Get()
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   async findAll(@Query() query: PaginationQueryDto) {
     const result = await this.productsService.findAll(query);
     return {
