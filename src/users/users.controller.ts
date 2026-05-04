@@ -15,6 +15,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto } from '../common/pagination/dtos/pagination_query.dto.js';
 import { CreateUserProvider } from './providers/create-user/create-user.abstract';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -24,6 +25,7 @@ export class UsersController {
     private readonly createUserProvider: CreateUserProvider,
   ) { }
 
+  @Public()
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.createUserProvider.createUser(createUserDto);

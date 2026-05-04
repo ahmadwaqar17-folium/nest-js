@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module, forwardRef, Provider } from '@nestjs/common';
 import { Hashing } from './providers/hashing/hashing';
 import { Bcrypt } from './providers/bcrypt/bcrypt';
 import { UsersModule } from '../users/users.module';
@@ -8,6 +8,12 @@ import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from './config/jwt.config';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AccessTokenGuard } from './guards/access-token.guard';
+import { APP_GUARD } from '@nestjs/core';
+
+const guardProvider: Provider = {
+  provide: APP_GUARD,
+  useClass: AccessTokenGuard,
+};
 
 @Module({
   imports: [
@@ -37,6 +43,7 @@ import { AccessTokenGuard } from './guards/access-token.guard';
     },
     AuthService,
     AccessTokenGuard,
+    guardProvider,
   ],
   exports: [Hashing, AuthService, AccessTokenGuard, JwtModule],
 })
